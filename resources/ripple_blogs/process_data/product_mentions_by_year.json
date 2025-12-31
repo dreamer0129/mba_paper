@@ -1,0 +1,97 @@
+{
+  "yearly_data": {
+    "2014": {
+      "XRP": 0,
+      "RLUSD": 0,
+      "ODL": 0,
+      "RippleNet": 0,
+      "article_count": 1
+    },
+    "2016": {
+      "XRP": 18,
+      "RLUSD": 0,
+      "ODL": 0,
+      "RippleNet": 0,
+      "article_count": 2
+    },
+    "2017": {
+      "XRP": 160,
+      "RLUSD": 0,
+      "ODL": 1,
+      "RippleNet": 5,
+      "article_count": 12
+    },
+    "2018": {
+      "XRP": 152,
+      "RLUSD": 0,
+      "ODL": 8,
+      "RippleNet": 34,
+      "article_count": 14
+    },
+    "2019": {
+      "XRP": 41,
+      "RLUSD": 0,
+      "ODL": 13,
+      "RippleNet": 20,
+      "article_count": 11
+    },
+    "2020": {
+      "XRP": 131,
+      "RLUSD": 0,
+      "ODL": 54,
+      "RippleNet": 31,
+      "article_count": 21
+    },
+    "2021": {
+      "XRP": 127,
+      "RLUSD": 0,
+      "ODL": 14,
+      "RippleNet": 53,
+      "article_count": 17
+    },
+    "2022": {
+      "XRP": 39,
+      "RLUSD": 0,
+      "ODL": 26,
+      "RippleNet": 11,
+      "article_count": 7
+    },
+    "2023": {
+      "XRP": 57,
+      "RLUSD": 0,
+      "ODL": 19,
+      "RippleNet": 6,
+      "article_count": 14
+    },
+    "2024": {
+      "XRP": 43,
+      "RLUSD": 4,
+      "ODL": 0,
+      "RippleNet": 0,
+      "article_count": 13
+    },
+    "2025": {
+      "XRP": 1735,
+      "RLUSD": 191,
+      "ODL": 276,
+      "RippleNet": 525,
+      "article_count": 450
+    }
+  },
+  "summary": {
+    "total_articles": 562,
+    "years_covered": [
+      2014,
+      2016,
+      2017,
+      2018,
+      2019,
+      2020,
+      2021,
+      2022,
+      2023,
+      2024,
+      2025
+    ]
+  }
+}
