@@ -136,63 +136,88 @@ def plot_time_comparison():
 
     # 数据准备
     payment_methods = [
-        '区块链/CBDC\n（跨境支付通）',
-        'PayPal\n（平台内）',
-        '国际信用卡',
-        '第三方支付\n平均',
-        '传统银行\n电汇',
-        '招商银行\n跨境电汇'
+        'Ripple\n(XRP)',
+        '第三方支付\n(支付宝/微信)',
+        'Visa/MasterCard\n(国际信用卡)',
+        '传统银行\n电汇'
     ]
 
-    # 到账时间（以天为单位，1天=24小时）
-    # 秒级 = 0.00001天，分钟级 = 0.001天
+    # 到账时间（以小时为单位，便于直观理解）
+    # Ripple: 3-5秒 = 0.001小时
+    # 第三方支付: 分钟到小时 = 0.5小时（30分钟平均）
+    # Visa/MasterCard: 小时到1天 = 12小时（半天平均）
+    # 传统银行电汇: 1-5天 = 72小时（3天平均）
     arrival_times = [
-        0.00001,  # 秒级
-        0.00001,  # T+0，秒级
-        0.001,    # 分钟级
-        2.0,      # T+2
-        4.0,      # 3-5工作日，取中间值4天
-        5.0       # T+5
+        0.001,   # 3-5秒
+        0.5,     # 30分钟
+        12,      # 12小时
+        72       # 3天
     ]
 
-    # 颜色设置：从快到慢，绿色->蓝色->橙色->红色
-    colors = ['#27AE60', '#27AE60', '#4A90E2', '#5DADE2', '#E67E22', '#E74C3C']
+    # 颜色设置：Ripple绿色高亮，其他从蓝到红渐变
+    colors = ['#27AE60', '#5DADE2', '#F39C12', '#E74C3C']
+    edge_colors = ['#1E8449', '#2E86C1', '#D68910', '#C0392B']
 
     # 创建水平条形图
     y_pos = np.arange(len(payment_methods))
     bars = ax.barh(y_pos, arrival_times,
                    color=colors,
-                   edgecolor='#2C3E50',
-                   linewidth=1.5,
+                   edgecolor=edge_colors,
+                   linewidth=2,
                    alpha=0.85)
 
-    # 添加数据标签（使用对数刻度更好展示）
-    labels = ['秒级', 'T+0（秒级）', '分钟级', 'T+2', '3-5工作日', 'T+5']
+    # 特别强调Ripple - 加粗边框
+    bars[0].set_linewidth(3)
+
+    # 添加数据标签
+    labels = ['3-5秒', '分钟-小时级', '小时-1天', '1-5天']
     for i, (bar, time, label) in enumerate(zip(bars, arrival_times, labels)):
         width = bar.get_width()
         if time < 0.01:  # 对于极小值，标签放在右侧
-            ax.text(0.1, bar.get_y() + bar.get_height()/2.,
+            ax.text(0.5, bar.get_y() + bar.get_height()/2.,
                     label,
                     ha='left', va='center',
-                    fontsize=11, fontweight='bold',
-                    color='#333333')
+                    fontsize=12, fontweight='bold',
+                    color='#FFFFFF',
+                    bbox=dict(boxstyle='round,pad=0.4',
+                             facecolor='#27AE60',
+                             edgecolor='#1E8449',
+                             linewidth=2))
         else:
-            ax.text(width + 0.2, bar.get_y() + bar.get_height()/2.,
+            ax.text(width + 2, bar.get_y() + bar.get_height()/2.,
                     label,
                     ha='left', va='center',
                     fontsize=11, fontweight='bold',
                     color='#333333')
+
+    # 添加"时间成本降低99%"的标注
+    # 从传统银行电汇到Ripple的箭头
+    ax.annotate('',
+                xy=(0.001, 0), xytext=(72, 3),
+                arrowprops=dict(arrowstyle='->', lw=2.5, color='#E74C3C',
+                               connectionstyle="arc3,rad=-.3",
+                               shrinkA=0, shrinkB=0))
+
+    # 添加文本框标注
+    ax.text(20, 1.5, '时间成本\n降低99%+',
+            ha='center', va='center',
+            fontsize=13, fontweight='bold',
+            color='#FFFFFF',
+            bbox=dict(boxstyle='round,pad=0.6',
+                     facecolor='#E74C3C',
+                     edgecolor='#C0392B',
+                     linewidth=2.5))
 
     # 设置坐标轴
-    ax.set_xlabel('到账时间（工作日）', fontsize=12, fontweight='bold')
+    ax.set_xlabel('到账时间（小时）', fontsize=12, fontweight='bold')
     ax.set_ylabel('支付方式', fontsize=12, fontweight='bold')
     ax.set_yticks(y_pos)
-    ax.set_yticklabels(payment_methods, fontsize=11)
+    ax.set_yticklabels(payment_methods, fontsize=11, fontweight='bold')
     ax.tick_params(axis='x', labelsize=10)
 
-    # 使用对数刻度
+    # 使用对数刻度以更好展示跨度大的数据
     ax.set_xscale('log')
-    ax.set_xlim(0.00001, 10)
+    ax.set_xlim(0.0005, 150)
 
     # 添加网格线
     ax.grid(True, axis='x', linestyle='--', alpha=0.3, color='#CCCCCC', linewidth=0.8)
@@ -200,16 +225,21 @@ def plot_time_comparison():
 
     # 添加图例
     legend_elements = [
-        mpatches.Patch(facecolor='#27AE60', label='实时/秒级'),
-        mpatches.Patch(facecolor='#4A90E2', label='1-2工作日'),
-        mpatches.Patch(facecolor='#E67E22', label='3-5工作日')
+        mpatches.Patch(facecolor='#27AE60', edgecolor='#1E8449',
+                      label='Ripple（秒级）', linewidth=2),
+        mpatches.Patch(facecolor='#5DADE2', edgecolor='#2E86C1',
+                      label='第三方支付（分钟-小时）'),
+        mpatches.Patch(facecolor='#F39C12', edgecolor='#D68910',
+                      label='国际卡组织（小时-天）'),
+        mpatches.Patch(facecolor='#E74C3C', edgecolor='#C0392B',
+                      label='传统银行（天级）')
     ]
     ax.legend(handles=legend_elements, loc='lower right',
               fontsize=10, frameon=True, fancybox=False,
-              shadow=False, framealpha=0.9, edgecolor='#CCCCCC')
+              shadow=False, framealpha=0.95, edgecolor='#999999')
 
     # 设置标题
-    ax.set_title('不同跨境支付方式到账时间对比',
+    ax.set_title('Ripple vs 传统跨境支付方式到账时间对比',
                  fontsize=14, fontweight='bold',
                  pad=20, color='#333333')
 
