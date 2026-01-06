@@ -131,11 +131,11 @@ for bars in [bars_c2c, bars_c2b, bars_b2c]:
         if height > 0.5:  # 只标注较大的值，避免拥挤
             ax1_dual.text(bar.get_x() + bar.get_width()/2., height + 0.1,
                          f'{height:.1f}',
-                         ha='center', va='bottom', fontsize=8)
+                         ha='center', va='bottom', fontsize=12)
 
-ax1_dual.set_xlabel('年份', fontsize=11, fontweight='bold')
-ax1_dual.set_ylabel('市场规模（万亿美元）', fontsize=11, fontweight='bold')
-ax1_dual.set_title('(a) 个人参与方细分市场规模', fontsize=12, fontweight='bold', pad=15)
+ax1_dual.set_xlabel('年份', fontsize=12, fontweight='bold')
+ax1_dual.set_ylabel('市场规模（万亿美元）', fontsize=12, fontweight='bold')
+ax1_dual.set_title('(a) 个人参与方细分市场规模', fontsize=14, fontweight='bold', pad=15)
 ax1_dual.set_xticks(x)
 ax1_dual.set_xticklabels(years)
 ax1_dual.legend(loc='upper left', fontsize=9)
@@ -161,8 +161,8 @@ for i, (bar, cagr) in enumerate(zip(bars_cagr, cagrs)):
 ax2_dual.axvline(x=30, color='red', linestyle='--', linewidth=1.5, alpha=0.5,
                  label='30%高增长基准')
 
-ax2_dual.set_xlabel('复合年增长率 (%)', fontsize=11, fontweight='bold')
-ax2_dual.set_title('(b) 增长率对比 (2020-2024)', fontsize=12, fontweight='bold', pad=15)
+ax2_dual.set_xlabel('复合年增长率 (%)', fontsize=12, fontweight='bold')
+ax2_dual.set_title('(b) 增长率对比 (2020-2024)', fontsize=14, fontweight='bold', pad=15)
 ax2_dual.legend(loc='lower right', fontsize=9)
 ax2_dual.grid(axis='x', alpha=0.3, linestyle='--')
 ax2_dual.set_xlim(0, max(cagrs) + 5)
