@@ -57,6 +57,154 @@ metrics = {
 import os
 os.makedirs('figure', exist_ok=True)
 
+
+def configure_time_axis(df_plot, metric_name):
+    """
+    根据数据实际时间范围动态配置时间轴
+
+    参数:
+        df_plot: DataFrame，包含'date'列和指标数据（已去除NaN）
+        metric_name: str，指标中文名称
+
+    返回:
+        dict或None: 包含title、major_locator、minor_locator、date_formatter、rotation
+                   如果数据为空返回None
+    """
+    # 边界情况1：空数据
+    if len(df_plot) == 0:
+        return None
+
+    # 边界情况2：单个数据点
+    if len(df_plot) == 1:
+        single_date = df_plot['date'].iloc[0]
+        year = single_date.year
+        return {
+            'title': f'Ripple网络{metric_name}变化趋势（{year}年）',
+            'major_locator': None,
+            'minor_locator': None,
+            'date_formatter': mdates.DateFormatter('%Y-%m-%d'),
+            'rotation': 0
+        }
+
+    # 计算实际时间范围
+    min_date = df_plot['date'].min()
+    max_date = df_plot['date'].max()
+    time_delta = max_date - min_date
+    time_span_days = time_delta.days
+    time_span_years = time_span_days / 365.25
+
+    start_year = min_date.year
+    end_year = max_date.year
+
+    # 生成动态标题
+    if start_year == end_year:
+        title_suffix = f'（{start_year}年）'
+    else:
+        title_suffix = f'（{start_year}-{end_year}）'
+    title = f'Ripple网络{metric_name}变化趋势{title_suffix}'
+
+    # 根据时间跨度选择刻度策略
+    if time_span_days < 7:
+        # 少于1周：每天
+        return {
+            'title': title,
+            'major_locator': mdates.DayLocator(interval=1),
+            'minor_locator': None,
+            'date_formatter': mdates.DateFormatter('%Y-%m-%d'),
+            'rotation': 45
+        }
+
+    elif time_span_days < 30:
+        # 少于1个月：每周
+        return {
+            'title': title,
+            'major_locator': mdates.WeekdayLocator(interval=1),
+            'minor_locator': mdates.DayLocator(interval=1),
+            'date_formatter': mdates.DateFormatter('%Y-%m-%d'),
+            'rotation': 45
+        }
+
+    elif time_span_years < 0.5:
+        # 少于半年：每月
+        return {
+            'title': title,
+            'major_locator': mdates.MonthLocator(interval=1),
+            'minor_locator': mdates.WeekdayLocator(byweekday=mdates.MO, interval=1),
+            'date_formatter': mdates.DateFormatter('%Y-%m'),
+            'rotation': 45
+        }
+
+    elif time_span_years < 1:
+        # 半年到1年：每2个月
+        return {
+            'title': title,
+            'major_locator': mdates.MonthLocator(interval=2),
+            'minor_locator': mdates.MonthLocator(interval=1),
+            'date_formatter': mdates.DateFormatter('%Y-%m'),
+            'rotation': 45
+        }
+
+    elif time_span_years < 3:
+        # 1-3年：每6个月
+        return {
+            'title': title,
+            'major_locator': mdates.MonthLocator(interval=6),
+            'minor_locator': mdates.MonthLocator(interval=3),
+            'date_formatter': mdates.DateFormatter('%Y-%m'),
+            'rotation': 45
+        }
+
+    elif time_span_years < 5:
+        # 3-5年：每年
+        return {
+            'title': title,
+            'major_locator': mdates.YearLocator(1),
+            'minor_locator': mdates.MonthLocator(interval=6),
+            'date_formatter': mdates.DateFormatter('%Y'),
+            'rotation': 45
+        }
+
+    elif time_span_years < 8:
+        # 5-8年：每年
+        return {
+            'title': title,
+            'major_locator': mdates.YearLocator(1),
+            'minor_locator': mdates.MonthLocator(interval=6),
+            'date_formatter': mdates.DateFormatter('%Y'),
+            'rotation': 45
+        }
+
+    elif time_span_years < 15:
+        # 8-15年：每2年
+        return {
+            'title': title,
+            'major_locator': mdates.YearLocator(2),
+            'minor_locator': mdates.YearLocator(1),
+            'date_formatter': mdates.DateFormatter('%Y'),
+            'rotation': 45
+        }
+
+    elif time_span_years < 25:
+        # 15-25年：每3年
+        return {
+            'title': title,
+            'major_locator': mdates.YearLocator(3),
+            'minor_locator': mdates.YearLocator(1),
+            'date_formatter': mdates.DateFormatter('%Y'),
+            'rotation': 45
+        }
+
+    else:
+        # ≥25年：每5年
+        return {
+            'title': title,
+            'major_locator': mdates.YearLocator(5),
+            'minor_locator': mdates.YearLocator(2),
+            'date_formatter': mdates.DateFormatter('%Y'),
+            'rotation': 45
+        }
+
+
 # 为每个指标绘制单独的图表
 for metric_key, metric_name in metrics.items():
     if metric_key not in df.columns:
@@ -70,20 +218,28 @@ for metric_key, metric_name in metrics.items():
         print(f"指标 {metric_name} 无有效数据")
         continue
 
+    # 动态配置时间轴
+    axis_config = configure_time_axis(df_plot, metric_name)
+    if axis_config is None:
+        print(f"指标 {metric_name} 时间轴配置失败")
+        continue
+
     fig, ax = plt.subplots(figsize=(14, 6))
 
     ax.plot(df_plot['date'], df_plot[metric_key], linewidth=1.5, color='#2E86AB', alpha=0.8)
     ax.set_xlabel('时间', fontsize=12)
     ax.set_ylabel(metric_name, fontsize=12)
-    ax.set_title(f'Ripple网络{metric_name}变化趋势（2013-2026）', fontsize=14, fontweight='bold')
+    ax.set_title(axis_config['title'], fontsize=14, fontweight='bold')
 
-    # 设置x轴日期格式
-    ax.xaxis.set_major_locator(mdates.YearLocator(2))  # 每2年一个主刻度
-    ax.xaxis.set_minor_locator(mdates.YearLocator(1))  # 每年一个次刻度
-    ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
+    # 设置x轴日期格式（动态配置）
+    if axis_config['major_locator']:
+        ax.xaxis.set_major_locator(axis_config['major_locator'])
+    if axis_config['minor_locator']:
+        ax.xaxis.set_minor_locator(axis_config['minor_locator'])
+    ax.xaxis.set_major_formatter(axis_config['date_formatter'])
 
-    # 旋转日期标签
-    plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, ha='right')
+    # 旋转日期标签（动态角度）
+    plt.setp(ax.xaxis.get_majorticklabels(), rotation=axis_config['rotation'], ha='right')
 
     # 添加网格
     ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.5)
@@ -104,9 +260,14 @@ for metric_key, metric_name in metrics.items():
 # 创建综合对比图（选择关键指标）
 print("\n正在创建综合对比图...")
 
+# 动态生成综合对比图标题
+overall_min = df['date'].min().year
+overall_max = df['date'].max().year
+title_suffix = f'（{overall_min}-{overall_max}）' if overall_min != overall_max else f'（{overall_min}年）'
+
 # 选择关键指标绘制多子图
 fig, axes = plt.subplots(3, 2, figsize=(16, 12))
-fig.suptitle('Ripple网络关键指标综合对比（2013-2026）', fontsize=16, fontweight='bold')
+fig.suptitle(f'Ripple网络关键指标综合对比{title_suffix}', fontsize=16, fontweight='bold')
 
 key_metrics = [
     ('transaction_count', '每日交易总数'),
@@ -130,10 +291,16 @@ for idx, (metric_key, metric_name) in enumerate(key_metrics):
         ax.set_ylabel(metric_name, fontsize=10)
         ax.set_title(metric_name, fontsize=11, fontweight='bold')
 
-        # 设置x轴日期格式
-        ax.xaxis.set_major_locator(mdates.YearLocator(3))
-        ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y'))
-        plt.setp(ax.xaxis.get_majorticklabels(), rotation=45, ha='right')
+        # 动态配置时间轴（为子图）
+        axis_config = configure_time_axis(df_plot, metric_name)
+        if axis_config:
+            # 设置x轴日期格式
+            if axis_config['major_locator']:
+                ax.xaxis.set_major_locator(axis_config['major_locator'])
+            if axis_config['minor_locator']:
+                ax.xaxis.set_minor_locator(axis_config['minor_locator'])
+            ax.xaxis.set_major_formatter(axis_config['date_formatter'])
+            plt.setp(ax.xaxis.get_majorticklabels(), rotation=axis_config['rotation'], ha='right')
 
         # 添加网格
         ax.grid(True, alpha=0.3, linestyle='--', linewidth=0.5)
@@ -162,8 +329,13 @@ yearly_stats = df.groupby('year').agg({
     'ledger_interval': 'mean'
 }).reset_index()
 
+# 动态生成年度统计图标题
+yearly_min = yearly_stats['year'].min()
+yearly_max = yearly_stats['year'].max()
+yearly_title_suffix = f'（{yearly_min}-{yearly_max}）' if yearly_min != yearly_max else f'（{yearly_min}年）'
+
 fig, axes = plt.subplots(2, 2, figsize=(14, 10))
-fig.suptitle('Ripple网络年度统计汇总（2013-2026）', fontsize=16, fontweight='bold')
+fig.suptitle(f'Ripple网络年度统计汇总{yearly_title_suffix}', fontsize=16, fontweight='bold')
 
 # 年度交易总数
 ax = axes[0, 0]
@@ -214,7 +386,7 @@ bars = ax.bar(yearly_stats['year'], yearly_stats['transaction_count'],
               color='#2E86AB', alpha=0.75, edgecolor='#1A5270', linewidth=1.2)
 ax.set_xlabel('年份', fontsize=12)
 ax.set_ylabel('交易总数', fontsize=12)
-ax.set_title('Ripple网络年度交易总数统计（2013-2026）', fontsize=14, fontweight='bold', pad=15)
+ax.set_title(f'Ripple网络年度交易总数统计{yearly_title_suffix}', fontsize=14, fontweight='bold', pad=15)
 ax.grid(True, alpha=0.3, axis='y', linestyle='--', linewidth=0.8)
 ax.ticklabel_format(style='scientific', axis='y', scilimits=(0,0))
 
@@ -236,7 +408,7 @@ bars = ax.bar(yearly_stats['year'], yearly_stats['payments_count'],
               color='#A23B72', alpha=0.75, edgecolor='#6B2750', linewidth=1.2)
 ax.set_xlabel('年份', fontsize=12)
 ax.set_ylabel('支付交易数', fontsize=12)
-ax.set_title('Ripple网络年度支付交易数统计（2013-2026）', fontsize=14, fontweight='bold', pad=15)
+ax.set_title(f'Ripple网络年度支付交易数统计{yearly_title_suffix}', fontsize=14, fontweight='bold', pad=15)
 ax.grid(True, alpha=0.3, axis='y', linestyle='--', linewidth=0.8)
 ax.ticklabel_format(style='scientific', axis='y', scilimits=(0,0))
 
@@ -258,7 +430,7 @@ bars = ax.bar(yearly_stats['year'], yearly_stats['accounts_created'],
               color='#F18F01', alpha=0.75, edgecolor='#C47301', linewidth=1.2)
 ax.set_xlabel('年份', fontsize=12)
 ax.set_ylabel('新增账户数', fontsize=12)
-ax.set_title('Ripple网络年度新增账户数统计（2013-2026）', fontsize=14, fontweight='bold', pad=15)
+ax.set_title(f'Ripple网络年度新增账户数统计{yearly_title_suffix}', fontsize=14, fontweight='bold', pad=15)
 ax.grid(True, alpha=0.3, axis='y', linestyle='--', linewidth=0.8)
 ax.ticklabel_format(style='scientific', axis='y', scilimits=(0,0))
 
@@ -280,7 +452,7 @@ bars = ax.bar(yearly_stats['year'], yearly_stats['tps'],
               color='#06A77D', alpha=0.75, edgecolor='#047A5D', linewidth=1.2)
 ax.set_xlabel('年份', fontsize=12)
 ax.set_ylabel('平均TPS（交易/秒）', fontsize=12)
-ax.set_title('Ripple网络年度平均TPS统计（2013-2026）', fontsize=14, fontweight='bold', pad=15)
+ax.set_title(f'Ripple网络年度平均TPS统计{yearly_title_suffix}', fontsize=14, fontweight='bold', pad=15)
 ax.grid(True, alpha=0.3, axis='y', linestyle='--', linewidth=0.8)
 
 # 在柱子顶部添加数值标签

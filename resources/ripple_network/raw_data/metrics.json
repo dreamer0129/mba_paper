@@ -54481,7 +54481,7 @@
       "fee_total": 159.575021,
       "active_accounts": 2221,
       "ledger_count": 924,
-      "ledger_interval": 93.50649350649351,
+      "ledger_interval": 3.899906170045267,
       "tx_per_ledger": 58.6948051948052
     }
   },
@@ -59597,7 +59597,7 @@
       "active_accounts": 1973,
       "active_users": 9554,
       "ledger_count": 932,
-      "ledger_interval": 92.70386266094421,
+      "ledger_interval": 3.869859974611854,
       "tx_per_ledger": 65.85515021459227
     }
   },
