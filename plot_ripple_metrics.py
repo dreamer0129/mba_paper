@@ -205,6 +205,96 @@ plt.savefig('figure/Ripple网络年度统计汇总.png', dpi=300, bbox_inches='t
 print("已保存: figure/Ripple网络年度统计汇总.png")
 plt.close()
 
+# 创建4张独立的年度统计图（用于论文各章节）
+print("\n正在创建独立的年度统计图...")
+
+# 1. 年度交易总数（独立图）
+fig, ax = plt.subplots(figsize=(12, 6))
+bars = ax.bar(yearly_stats['year'], yearly_stats['transaction_count'],
+              color='#2E86AB', alpha=0.75, edgecolor='#1A5270', linewidth=1.2)
+ax.set_xlabel('年份', fontsize=12)
+ax.set_ylabel('交易总数', fontsize=12)
+ax.set_title('Ripple网络年度交易总数统计（2013-2026）', fontsize=14, fontweight='bold', pad=15)
+ax.grid(True, alpha=0.3, axis='y', linestyle='--', linewidth=0.8)
+ax.ticklabel_format(style='scientific', axis='y', scilimits=(0,0))
+
+# 在柱子顶部添加数值标签
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width()/2., height,
+            f'{height:.2e}',
+            ha='center', va='bottom', fontsize=9, rotation=0)
+
+plt.tight_layout()
+plt.savefig('figure/Ripple网络年度交易总数统计.png', dpi=300, bbox_inches='tight')
+print("已保存: figure/Ripple网络年度交易总数统计.png")
+plt.close()
+
+# 2. 年度支付交易数（独立图）
+fig, ax = plt.subplots(figsize=(12, 6))
+bars = ax.bar(yearly_stats['year'], yearly_stats['payments_count'],
+              color='#A23B72', alpha=0.75, edgecolor='#6B2750', linewidth=1.2)
+ax.set_xlabel('年份', fontsize=12)
+ax.set_ylabel('支付交易数', fontsize=12)
+ax.set_title('Ripple网络年度支付交易数统计（2013-2026）', fontsize=14, fontweight='bold', pad=15)
+ax.grid(True, alpha=0.3, axis='y', linestyle='--', linewidth=0.8)
+ax.ticklabel_format(style='scientific', axis='y', scilimits=(0,0))
+
+# 在柱子顶部添加数值标签
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width()/2., height,
+            f'{height:.2e}',
+            ha='center', va='bottom', fontsize=9, rotation=0)
+
+plt.tight_layout()
+plt.savefig('figure/Ripple网络年度支付交易数统计.png', dpi=300, bbox_inches='tight')
+print("已保存: figure/Ripple网络年度支付交易数统计.png")
+plt.close()
+
+# 3. 年度新增账户数（独立图）
+fig, ax = plt.subplots(figsize=(12, 6))
+bars = ax.bar(yearly_stats['year'], yearly_stats['accounts_created'],
+              color='#F18F01', alpha=0.75, edgecolor='#C47301', linewidth=1.2)
+ax.set_xlabel('年份', fontsize=12)
+ax.set_ylabel('新增账户数', fontsize=12)
+ax.set_title('Ripple网络年度新增账户数统计（2013-2026）', fontsize=14, fontweight='bold', pad=15)
+ax.grid(True, alpha=0.3, axis='y', linestyle='--', linewidth=0.8)
+ax.ticklabel_format(style='scientific', axis='y', scilimits=(0,0))
+
+# 在柱子顶部添加数值标签
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width()/2., height,
+            f'{height:.2e}',
+            ha='center', va='bottom', fontsize=9, rotation=0)
+
+plt.tight_layout()
+plt.savefig('figure/Ripple网络年度新增账户数统计.png', dpi=300, bbox_inches='tight')
+print("已保存: figure/Ripple网络年度新增账户数统计.png")
+plt.close()
+
+# 4. 年度平均TPS（独立图）
+fig, ax = plt.subplots(figsize=(12, 6))
+bars = ax.bar(yearly_stats['year'], yearly_stats['tps'],
+              color='#06A77D', alpha=0.75, edgecolor='#047A5D', linewidth=1.2)
+ax.set_xlabel('年份', fontsize=12)
+ax.set_ylabel('平均TPS（交易/秒）', fontsize=12)
+ax.set_title('Ripple网络年度平均TPS统计（2013-2026）', fontsize=14, fontweight='bold', pad=15)
+ax.grid(True, alpha=0.3, axis='y', linestyle='--', linewidth=0.8)
+
+# 在柱子顶部添加数值标签
+for bar in bars:
+    height = bar.get_height()
+    ax.text(bar.get_x() + bar.get_width()/2., height,
+            f'{height:.1f}',
+            ha='center', va='bottom', fontsize=9, rotation=0)
+
+plt.tight_layout()
+plt.savefig('figure/Ripple网络年度平均TPS统计.png', dpi=300, bbox_inches='tight')
+print("已保存: figure/Ripple网络年度平均TPS统计.png")
+plt.close()
+
 print("\n所有图表绘制完成！")
 print(f"\n数据概览：")
 print(f"时间范围: {df['date'].min().date()} 至 {df['date'].max().date()}")
