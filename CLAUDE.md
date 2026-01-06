@@ -186,3 +186,11 @@ mba_paper_2/
 - 保持中文写作的学术严谨性
 - 数据来源应明确标注（主要来自 `resources/report/` 中的行业报告）
 - 本论文聚焦"中小规模支付场景"的效率优化潜力
+
+## python 图表绘制
+
+### 设置中文字体支持
+
+plt.rcParams['font.family'] = 'sans-serif'
+plt.rcParams['font.sans-serif'] = ['WenQuanYi Zen Hei', 'Noto Sans CJK SC', 'DejaVu Sans']
+plt.rcParams['axes.unicode_minus'] = False # 解决负号显示问题
